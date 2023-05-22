@@ -31,6 +31,7 @@ class mqtt_interface():
         self.prefix = mqtt_topic_prefix
         self.address_offset = self.config.get('address_offset', 0)
         self.registers = self.config['registers']
+        self.disconnect_between = self.config.get('disconnect_between', False)
         for register in self.registers:
             register['address'] += self.address_offset
         self.modbus_connect_retries = -1  # Retry forever by default
@@ -38,7 +39,8 @@ class mqtt_interface():
 
     def connect(self):
         # Connects to modbus and MQTT.
-        self.connect_modbus()
+        if not self.disconnect_between:
+            self.connect_modbus()
         self.connect_mqtt()
 
     def connect_modbus(self):
@@ -68,6 +70,9 @@ class mqtt_interface():
             self._mb.add_monitor_register(register.get('table', 'holding'), register['address'], register.get('type', 'uint16'))
             register['value'] = None
 
+    def disconnect_modbus(self):
+        self._mb.disconnect()
+
     def modbus_connection_failed(self):
         exit(1)
 
@@ -89,6 +94,9 @@ class mqtt_interface():
         return [register for register in self.registers if required_key in register]
 
     def poll(self):
+        if self.disconnect_between:
+            self.connect_modbus()
+
         try:
             self._mb.poll()
         except Exception as e:
@@ -140,6 +148,9 @@ class mqtt_interface():
             else:
                 retain = register.get('retain', False)
                 self._mqtt_client.publish(self.prefix+register['pub_topic'], value, retain=retain)
+
+        if self.disconnect_between:
+            self.disconnect_modbus()
 
         # Transmit the queued JSON messages.
         for topic, message in json_messages.items():

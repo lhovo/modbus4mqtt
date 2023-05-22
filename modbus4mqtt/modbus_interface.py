@@ -67,6 +67,9 @@ class modbus_interface():
                                        framer=ModbusSocketFramer, timeout=1,
                                        RetryOnEmpty=True, retries=1)
 
+    def disconnect(self):
+        self._mb.close()
+
     def add_monitor_register(self, table, addr, type='uint16'):
         # Accepts a modbus register and table to monitor
         if table not in self._tables:
