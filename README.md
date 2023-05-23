@@ -52,7 +52,7 @@ Look at the [Sungrow SH5k-20](./modbus4mqtt/Sungrow_SH5k_20.yaml) configuration 
 ip: 192.168.1.89
 port: 502
 connection_retry: 0
-disconnect_between: false
+disconnect_between_sample: false
 update_rate: 5
 address_offset: 0
 variant: sungrow
@@ -63,8 +63,8 @@ word_order: highlow
 | ---------- | -------- | ------- | ----------- |
 | ip | Required | N/A | The IP address of the modbus device to be polled. Presently only modbus TCP/IP is supported. |
 | port | Optional | 502 | The port on the modbus device to connect to. |
-| connection_retry | Optional | 0 | The number of seconds to back off when a modbus error occurs to then try reconnect. 0 = connection_retry disabled |
-| disconnect_between | Optional | false | Disconnect the modbus connection between samples to allow other clients to connect and read from the bus |
+| connection_retry | Optional | 0 | The number of seconds to back off when a modbus error occurs, this will cause a disconnect and reconnect event. <br /> 0 = connection_retry disabled |
+| disconnect_between_sample | Optional | false | Disconnect the modbus connection between samples to allow other clients to connect and read from the bus |
 | update_rate | Optional | 5 | The number of seconds between polls of the modbus device. |
 | address_offset | Optional | 0 | This offset is applied to every register address to accommodate different Modbus addressing systems. In many Modbus devices the first register is enumerated as 1, other times 0. See section 4.4 of the Modbus spec. |
 | variant | Optional | N/A | Allows variants of the ModbusTcpClient library to be used. Setting this to 'sungrow' enables support of SungrowModbusTcpClient. This library transparently decrypts the modbus comms with sungrow SH inverters running newer firmware versions. |
